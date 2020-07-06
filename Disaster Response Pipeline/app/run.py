@@ -43,6 +43,13 @@ def index():
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
     
+    viz = df.groupby('genre').sum().reset_index().drop(columns = ['id'])
+    topics = df.columns[4:].tolist()
+    topic_count = []
+    for index, row in viz.iterrows():
+        tmp = Bar(name=row.genre, x= topics, y= row[1:].values)
+        topic_count.append(tmp)
+
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
     graphs = [
@@ -61,6 +68,19 @@ def index():
                 },
                 'xaxis': {
                     'title': "Genre"
+                }
+            }
+        },
+        {
+            'data': topic_count,
+            'layout': {
+                'barmode': 'stack',
+                'title': 'Distribution of Message Topic',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': "Topic"
                 }
             }
         }

@@ -38,7 +38,8 @@ def load_data(database_filepath):
 
 def tokenize(text):
     text = re.sub(r"[^a-zA-Z0-9]", " ", text.lower())
-    
+    stop_words = stopwords.words("english")
+
     # tokenize and lemmatize
     tokens = word_tokenize(text)
     lemmatizer = WordNetLemmatizer()
@@ -46,7 +47,8 @@ def tokenize(text):
     clean_tokens = []
     for tok in tokens:
         clean_tok = lemmatizer.lemmatize(tok).strip()
-        clean_tokens.append(clean_tok)
+        if clean_tok not in stop_words:
+            clean_tokens.append(clean_tok)
 
     return(clean_tokens)
 
@@ -64,13 +66,9 @@ def build_model():
     ])
     
     parameters = {
-#         'features__text_pipeline__vect__ngram_range': ((1, 1), (1, 2)),
-#         'features__text_pipeline__vect__max_df': (0.5, 0.75, 1.0),
-#         'features__text_pipeline__vect__max_features': (None, 5000, 10000),
-#         'features__text_pipeline__tfidf__use_idf': (True, False),
-        'features__text_pipeline__vect__stop_words': (None, 'english')
-#         'clf__estimator__n_estimators': [50, 100, 200],
-#         'clf__estimator__min_samples_split': [2, 3, 4]
+        'features__text_pipeline__vect__ngram_range': ((1, 1), (1, 2)),
+        'features__text_pipeline__tfidf__use_idf': (True, False),
+        'clf__estimator__min_samples_split': [2, 3]
         }
     cv = GridSearchCV(pipeline, param_grid=parameters)
     
