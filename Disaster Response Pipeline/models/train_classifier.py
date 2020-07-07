@@ -89,10 +89,11 @@ def evaluate_model(model, X_test, Y_test, category_names):
     
     category_names = category_names
     cl_report = classification_report(Y_test, Y_pred, target_names = category_names)
+    best_score = model.best_estimator_.score(X_test, Y_test)
 
     print("Labels:", category_names)
     print("Classification Report:\n", cl_report)
-    print("Accuracy:", model.best_score_)
+    print("Best Score:", best_score)
     print("\nBest Parameters:", model.best_params_)
 
 #save model to target dictionary
