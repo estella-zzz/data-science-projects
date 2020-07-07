@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from sqlalchemy import create_engine
 
+
 def load_data(messages_filepath, categories_filepath):
     # load datasets    
     messages = pd.read_csv(messages_filepath)
@@ -12,6 +13,7 @@ def load_data(messages_filepath, categories_filepath):
     df = messages.merge(categories, how = 'inner', on = 'id')
     
     return df
+
 
 def clean_data(df):
     # create a dataframe of the 36 individual category columns    
@@ -31,11 +33,13 @@ def clean_data(df):
     df.drop(columns = ['categories'], inplace = True)
     df = pd.concat([df, categories], axis = 1)
     
-    #remove dupes
+    # remove dupes
     df = df.drop_duplicates()
 
     return df
 
+
+#save clean data to target dictionary
 def save_data(df, database_filename):
     engine = create_engine('sqlite:///%s' % database_filename)
     df.to_sql('DisasterResponse', engine, index=False, if_exists='replace')

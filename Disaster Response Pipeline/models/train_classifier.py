@@ -21,6 +21,7 @@ from nltk.tokenize import word_tokenize
 
 import pickle
 
+
 def load_data(database_filepath):
     # load data from database
     engine = create_engine('sqlite:///%s' % database_filepath)
@@ -29,7 +30,7 @@ def load_data(database_filepath):
     # remove invalid values from 'related'
     df = df.loc[df['related'] != 2]
 
-    #remove topics that don't have any positive results
+    # remove topics that don't have any positive results
     rm_list = []
     for col in df.columns[4:]:
         if df[col].sum() == 0:
@@ -45,6 +46,7 @@ def load_data(database_filepath):
 
 
 def tokenize(text):
+    # normalize the text
     text = re.sub(r"[^a-zA-Z0-9]", " ", text.lower())
 
     # tokenize and lemmatize
@@ -59,6 +61,7 @@ def tokenize(text):
     return(clean_tokens)
 
 
+# build pipeline with features, classifier and grid search
 def build_model():
     pipeline = Pipeline([
         ('features', FeatureUnion([
@@ -80,19 +83,19 @@ def build_model():
     return cv
 
 
+# evaluate model score
 def evaluate_model(model, X_test, Y_test, category_names):
     Y_pred = model.predict(X_test)
     
     category_names = category_names
     cl_report = classification_report(Y_test, Y_pred, target_names = category_names)
-    accuracy = (Y_pred == Y_test).mean()
 
     print("Labels:", category_names)
     print("Classification Report:\n", cl_report)
-    print("Accuracy:", accuracy)
+    print("Accuracy:", model.best_score_)
     print("\nBest Parameters:", model.best_params_)
 
-
+#save model to target dictionary
 def save_model(model, model_filepath):
     filename = model_filepath
     pickle.dump(model, open(filename, 'wb'))
