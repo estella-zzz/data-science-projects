@@ -1,8 +1,7 @@
 # untracked files
 classifier.pkl
 DisastterResponse.db
-ETL Pipeline Preparation.ipynb
-ML Pipeline Preparation.ipynb
+*.ipynb
 
 # macOS Files
 .DS_Store
