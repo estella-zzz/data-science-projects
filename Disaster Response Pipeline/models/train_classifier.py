@@ -28,6 +28,13 @@ def load_data(database_filepath):
     
     # remove invalid values from 'related'
     df = df.loc[df['related'] != 2]
+
+    #remove topics that don't have any positive results
+    rm_list = []
+    for col in df.columns[4:]:
+        if df[col].sum() == 0:
+            rm_list.append(col)
+    df = df.drop(columns = rm_list)
     
     X = df.message.values
     y_data = df.drop(columns = ['id', 'message', 'original', 'genre'])
@@ -66,10 +73,9 @@ def build_model():
     
     parameters = {
         'features__text_pipeline__vect__ngram_range': ((1, 1), (1, 2)),
-        'features__text_pipeline__tfidf__use_idf': (True, False),
         'clf__estimator__min_samples_split': [2, 3]
         }
-    cv = GridSearchCV(pipeline, param_grid=parameters, n_jobs = -1)
+    cv = GridSearchCV(pipeline, param_grid=parameters, n_jobs = -1, verbose = 1)
     
     return cv
 
@@ -97,7 +103,6 @@ def main():
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))
         X, Y, category_names = load_data(database_filepath)
         X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2)
-        stop_words = stopwords.words("english")
         
         print('Building model...')
         model = build_model()
