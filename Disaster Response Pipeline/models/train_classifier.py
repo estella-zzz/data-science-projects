@@ -4,6 +4,7 @@ import numpy as np
 import re
 from sqlalchemy import create_engine
 
+import joblib
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.pipeline import Pipeline, FeatureUnion
@@ -38,7 +39,6 @@ def load_data(database_filepath):
 
 def tokenize(text):
     text = re.sub(r"[^a-zA-Z0-9]", " ", text.lower())
-    stop_words = stopwords.words("english")
 
     # tokenize and lemmatize
     tokens = word_tokenize(text)
@@ -47,8 +47,7 @@ def tokenize(text):
     clean_tokens = []
     for tok in tokens:
         clean_tok = lemmatizer.lemmatize(tok).strip()
-        if clean_tok not in stop_words:
-            clean_tokens.append(clean_tok)
+        clean_tokens.append(clean_tok)
 
     return(clean_tokens)
 
@@ -70,7 +69,7 @@ def build_model():
         'features__text_pipeline__tfidf__use_idf': (True, False),
         'clf__estimator__min_samples_split': [2, 3]
         }
-    cv = GridSearchCV(pipeline, param_grid=parameters)
+    cv = GridSearchCV(pipeline, param_grid=parameters, n_jobs = -1)
     
     return cv
 
@@ -98,6 +97,7 @@ def main():
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))
         X, Y, category_names = load_data(database_filepath)
         X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2)
+        stop_words = stopwords.words("english")
         
         print('Building model...')
         model = build_model()
