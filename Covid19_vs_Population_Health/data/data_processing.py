@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from sqlalchemy import create_engine
 
-census = pd.read_csv('census-tract-level-data-2019.csv')
+census = pd.read_csv('census-2018.csv')
 covid = pd.read_csv('COVID19_US.csv')
 
 covid.columns = [x.lower() for x in covid.columns]
