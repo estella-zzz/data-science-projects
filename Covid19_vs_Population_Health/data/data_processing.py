@@ -38,7 +38,7 @@ map = census.merge(cities[['city', 'state_id','county_name','county_fips','densi
 map = map.dropna(subset = ['county_name','Data_Value'])
 
 ## Adjust census data shape
-map['Data_Value'] = map.apply(lambda x: x['Data_Value'] * x['PopulationCount'] / 100, axis =1)
+map['Data_Value'] = map.apply(lambda x: x['Data_Value'] * x['PopulationCount'], axis =1)
 map_new = map.groupby(['CityName','county_fips','state_id','density','MeasureId']).agg({'PopulationCount':'sum','Data_Value':'sum'}).reset_index()
 map_new['Data_Value'] = map_new.apply(lambda x: x['Data_Value']/x['PopulationCount'], axis = 1)
 map_new = map_new.pivot_table(index = ['CityName', 'county_fips', 'state_id','PopulationCount','density'],columns = ['MeasureId'],values = ['Data_Value']).reset_index()
