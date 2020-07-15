@@ -1,2 +1,5 @@
 #csv too large
 *.csv
+
+# macOS Files
+.DS_Store
