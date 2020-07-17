@@ -58,7 +58,36 @@ covid_new = covid_new.drop(columns = ['county_fips','population','people_positiv
 output = map_new.merge(covid_new, how = 'inner', left_on = 'county_fips', right_on = 'county_fips_number')
 output = output.drop(columns = ['county_fips_number','PopulationCount'])
 
+##100d cases/death
+fcd = covid.loc[covid['people_positive_cases_count']>0].groupby('county_fips_number').agg({'report_date':'min'}).reset_index()
+fcd = fcd.rename(columns = {'report_date':'first_date'})
+covid_100d = covid.merge(fcd, how = 'inner', on = 'county_fips_number')
+covid_100d['days_since'] = covid_100d.apply(lambda x: (x['report_date'] - x['first_date']).days, axis = 1)
+covid_100d = covid_100d.loc[covid_100d['days_since'] == 100][['people_positive_cases_count','county_fips_number','people_death_count', 'first_date']]
+
+covid_100d = covid_100d.merge(city_pop, left_on = 'county_fips_number', right_on = 'county_fips')
+covid_100d['case1m'] = covid_100d.apply(lambda x: x['people_positive_cases_count']/x['population'] * 1000000, axis = 1)
+covid_100d['death1m'] = covid_100d.apply(lambda x: x['people_death_count']/x['population'] * 1000000, axis = 1)
+covid_100d = covid_100d.drop(columns = ['county_fips','population','people_positive_cases_count','people_death_count'])
+
+output_100 = map_new.merge(covid_100d, how = 'inner', left_on = 'county_fips', right_on = 'county_fips_number')
+output_100 = output_100.drop(columns = ['county_fips_number','PopulationCount'])
+
+covid14d = covid.merge(fcd, how = 'inner', on = 'county_fips_number')
+covid14d['days_since'] = covid14d.apply(lambda x: (x['report_date'] - x['first_date']).days, axis = 1)
+covid14d = covid14d.loc[covid14d['days_since'] == 86][['people_positive_cases_count','county_fips_number','people_death_count', 'first_date']]
+covid14d = covid14d.merge(city_pop, left_on = 'county_fips_number', right_on = 'county_fips')
+covid14d['case14'] = covid14d.apply(lambda x: x['people_positive_cases_count']/x['population'] * 1000000, axis = 1)
+covid14d['death14'] = covid14d.apply(lambda x: x['people_death_count']/x['population'] * 1000000, axis = 1)
+covid14d = covid14d.drop(columns = ['county_fips','population','people_positive_cases_count','people_death_count'])
+
+output_100 = output_100.merge(covid14d[['county_fips_number', 'case14', 'death14']], how = 'inner',left_on = 'county_fips',right_on = 'county_fips_number')
+output_100['case14'] = output_100['case1m'] - output_100['case14']
+output_100['death14'] = output_100['death1m'] - output_100['death14']
+
 ## Save to coviddb
 engine = create_engine('sqlite:///%s' % 'coviddb')
 output.to_sql('CovidData', engine, index=False, if_exists='replace')
 measures.to_sql('MeasureLookup', engine, index=False, if_exists='replace')
+
+output_100.to_sql('Covid100', engine, index=False, if_exists='replace')
