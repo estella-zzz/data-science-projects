@@ -3,6 +3,9 @@
 ### Overview
 This project uses the daily COVID activity data from data.world, the 500 Cities: Local Data for Better Health, 2018 release from CDC and mapping data from simplemaps to study how population health measures impact the COVID-19 spread in U.S cities. Please see the blog post for details.
 
+Old Health Behaviors Are Shaping Our ‘New Normal’
+blog post: https://medium.com/@kxestella.zzz/old-health-behaviors-are-shaping-our-new-normal-fbe6b6c072dd
+
 
 ### Data Source
 - Census data: https://catalog.data.gov/dataset/500-cities-local-data-for-better-health-2018-release-7203f
